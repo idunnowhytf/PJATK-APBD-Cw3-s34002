@@ -1,9 +1,12 @@
 using LinqConsoleLab.PL.Data;
+using LinqConsoleLab.PL.Models;
 
 namespace LinqConsoleLab.PL.Exercises;
 
 public sealed class ZadaniaLinq
 {
+
+    
     /// <summary>
     /// Zadanie:
     /// Wyszukaj wszystkich studentów mieszkających w Warsaw.
@@ -18,6 +21,12 @@ public sealed class ZadaniaLinq
     /// 
     public IEnumerable<string> Zadanie01_StudenciZWarszawy()
     {
+        
+            
+        return DaneUczelni.Studenci
+            .Where(s => s.Miasto == "Warsaw")
+            .Select(s => $"{s.NumerIndeksu} | {s.Imie} {s.Nazwisko} | {s.Miasto}");
+        
         throw Niezaimplementowano(nameof(Zadanie01_StudenciZWarszawy));
     }
 
@@ -32,6 +41,9 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie02_AdresyEmailStudentow()
     {
+
+        return DaneUczelni.Studenci.Select(s => s.Email);
+        
         throw Niezaimplementowano(nameof(Zadanie02_AdresyEmailStudentow));
     }
 
@@ -47,6 +59,10 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie03_StudenciPosortowani()
     {
+        return  DaneUczelni.Studenci
+            .OrderBy(s => s.Nazwisko)
+            .ThenBy(s => s.Imie)
+            .Select(s => $"{s.NumerIndeksu} | {s.Imie} {s.Nazwisko}");
         throw Niezaimplementowano(nameof(Zadanie03_StudenciPosortowani));
     }
 
@@ -62,6 +78,11 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie04_PierwszyPrzedmiotAnalityczny()
     {
+        var przedmiot = DaneUczelni.Przedmioty
+            .Where(p => p.Kategoria == "Analytics")
+                .Select(p => $"{p.Nazwa} | Data startu: {p.DataStartu:yyyy-MM-dd}")
+            .FirstOrDefault();
+        return new[] { przedmiot ?? "Brak przedmiotu w tej kategorii." };
         throw Niezaimplementowano(nameof(Zadanie04_PierwszyPrzedmiotAnalityczny));
     }
 
@@ -79,6 +100,7 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie05_CzyIstniejeNieaktywneZapisanie()
     {
+        
         throw Niezaimplementowano(nameof(Zadanie05_CzyIstniejeNieaktywneZapisanie));
     }
 
