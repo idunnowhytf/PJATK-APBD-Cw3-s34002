@@ -80,9 +80,9 @@ public sealed class ZadaniaLinq
     {
         var przedmiot = DaneUczelni.Przedmioty
             .Where(p => p.Kategoria == "Analytics")
-                .Select(p => $"{p.Nazwa} | Data startu: {p.DataStartu:yyyy-MM-dd}")
+                .Select(p => $"{p.Nazwa} | data startu: {p.DataStartu:yyyy-MM-dd}")
             .FirstOrDefault();
-        return new[] { przedmiot ?? "Brak przedmiotu w tej kategorii." };
+        return new[] { przedmiot ?? "brak przedmiotu w tej kategorii." };
         throw Niezaimplementowano(nameof(Zadanie04_PierwszyPrzedmiotAnalityczny));
     }
 
@@ -211,7 +211,7 @@ public sealed class ZadaniaLinq
     {
         return from s in DaneUczelni.Studenci
             join z in DaneUczelni.Zapisy on s.Id equals z.StudentId
-                select $"{s.Imie} {s.Nazwisko} | Data zapisu {z.DataZapisu:yyyy-MM-dd}";
+                select $"{s.Imie} {s.Nazwisko} | data zapisu {z.DataZapisu:yyyy-MM-dd}";
         throw Niezaimplementowano(nameof(Zadanie11_PolaczStudentowIZapisy));
     }
 
@@ -247,6 +247,10 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie13_GrupowanieZapisowWedlugPrzedmiotu()
     {
+        return DaneUczelni.Zapisy
+            .Join(DaneUczelni.Przedmioty, z => z.PrzedmiotId, p => p.Id, (z, p) => p.Nazwa)
+            .GroupBy(nazwa => nazwa)
+            .Select(g => $"{g.Key} | {g.Count()} zapisow");
         throw Niezaimplementowano(nameof(Zadanie13_GrupowanieZapisowWedlugPrzedmiotu));
     }
 
@@ -264,6 +268,12 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie14_SredniaOcenaNaPrzedmiot()
     {
+        
+        return DaneUczelni.Zapisy
+            .Where(z => z.OcenaKoncowa.HasValue)
+            .Join(DaneUczelni.Przedmioty, z => z.PrzedmiotId, p => p.Id, (z, p) => new { p.Nazwa, Ocena = z.OcenaKoncowa.Value })
+            .GroupBy(x => x.Nazwa)
+            .Select(g => $"{g.Key} : srednia {g.Average(x => x.Ocena):F2}");
         throw Niezaimplementowano(nameof(Zadanie14_SredniaOcenaNaPrzedmiot));
     }
 
@@ -280,6 +290,11 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie15_ProwadzacyILiczbaPrzedmiotow()
     {
+        return DaneUczelni.Prowadzacy
+            .GroupJoin(DaneUczelni.Przedmioty,
+                pr => pr.Id,
+                p => p.ProwadzacyId,
+                (pr, przedmioty) => $"{pr.Imie} {pr.Nazwisko} | liczba przedmiotow: {przedmioty.Count()}");
         throw Niezaimplementowano(nameof(Zadanie15_ProwadzacyILiczbaPrzedmiotow));
     }
 
@@ -297,6 +312,11 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie16_NajwyzszaOcenaKazdegoStudenta()
     {
+        return DaneUczelni.Zapisy
+            .Where(z => z.OcenaKoncowa.HasValue)
+            .Join(DaneUczelni.Studenci, z => z.StudentId, s => s.Id, (z, s) => new { s.Imie, s.Nazwisko, Ocena = z.OcenaKoncowa.Value })
+            .GroupBy(x => new { x.Imie, x.Nazwisko })
+            .Select(g => $"{g.Key.Imie} {g.Key.Nazwisko} | najwyzsza ocena koncowa: {g.Max(x => x.Ocena)}");
         throw Niezaimplementowano(nameof(Zadanie16_NajwyzszaOcenaKazdegoStudenta));
     }
 
